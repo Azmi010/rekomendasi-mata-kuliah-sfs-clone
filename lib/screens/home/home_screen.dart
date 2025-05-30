@@ -46,12 +46,14 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       InkWell(
-                          onTap: () {},
-                          child: Icon(Icons.notifications, color: Colors.white),
-                        )
+                        onTap: () {},
+                        child: Icon(Icons.notifications, color: Colors.white),
+                      )
                     ],
                   ),
-                  Divider(color: Colors.white,),
+                  Divider(
+                    color: Colors.white,
+                  ),
                   Row(
                     children: [
                       CircleAvatar(
@@ -125,11 +127,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.wifi, title: 'Cek Kuota', onTap: () {}),
                 MenuGridItem(icon: Icons.event, title: 'Event', onTap: () {}),
                 MenuGridItem(
-                    icon: Icons.more_horiz,
-                    title: 'More',
-                    onTap: () {
-                      authProvider.signOut();
-                    }),
+                    icon: Icons.more_horiz, title: 'More', onTap: () {}),
               ],
             ),
             const SizedBox(height: 20),
@@ -262,26 +260,6 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Akun',
-          ),
-        ],
-        currentIndex: 0,
-        selectedItemColor: Color(0xFF1E90FF),
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          // TODO: Implementasi navigasi bottom bar
-          if (index == 1) {
-          }
-        },
       ),
     );
   }
