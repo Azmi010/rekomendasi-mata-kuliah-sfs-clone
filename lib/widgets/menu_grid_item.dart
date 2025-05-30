@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class MenuGridItem extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
   final String title;
   final VoidCallback onTap;
 
   const MenuGridItem({
     super.key,
     required this.icon,
+    this.iconColor = const Color(0xFF1E90FF),
     required this.title,
     required this.onTap,
   });
@@ -32,7 +34,7 @@ class MenuGridItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 30, color: const Color(0xFF1E90FF)),
+            Icon(icon, size: 30, color: iconColor),
             const SizedBox(height: 8),
             Text(
               title,

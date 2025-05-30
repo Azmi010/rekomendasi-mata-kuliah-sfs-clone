@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sfs/providers/auth_provider.dart';
+import 'package:sfs/widgets/all_services_bottom_sheet.dart';
 import 'package:sfs/widgets/menu_grid_item.dart';
 import 'package:sfs/widgets/schedule_list_item.dart';
 
@@ -127,7 +128,21 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.wifi, title: 'Cek Kuota', onTap: () {}),
                 MenuGridItem(icon: Icons.event, title: 'Event', onTap: () {}),
                 MenuGridItem(
-                    icon: Icons.more_horiz, title: 'More', onTap: () {}),
+                    icon: Icons.more_horiz,
+                    title: 'More',
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20.0)),
+                        ),
+                        builder: (BuildContext context) {
+                          return const AllServicesBottomSheet();
+                        },
+                      );
+                    }),
               ],
             ),
             const SizedBox(height: 20),
