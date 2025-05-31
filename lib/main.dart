@@ -6,6 +6,7 @@ import 'package:sfs/services/auth_service.dart';
 import 'package:sfs/screens/auth/login_screen.dart';
 import 'package:sfs/screens/home/home_screen.dart';
 import 'package:sfs/screens/account/account_screen.dart';
+import 'package:sfs/services/course_service.dart';
 import 'package:sfs/widgets/bottom_navbar.dart';
 import 'firebase_options.dart';
 
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(create: (_) => BottomNavBarProvider()),
+        Provider<CourseService>(create: (_) => CourseService()),
       ],
       child: MaterialApp(
         title: 'SISTER for Student',

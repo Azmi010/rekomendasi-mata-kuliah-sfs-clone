@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sfs/screens/study_plan/add_course_screen.dart';
 
 class StudyPlanScreen extends StatelessWidget {
   const StudyPlanScreen({super.key});
@@ -227,10 +228,10 @@ class StudyPlanScreen extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Fitur Tambah Data belum diimplementasikan.')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AddCourseScreen()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -250,8 +251,7 @@ class StudyPlanScreen extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      _showCompleteKRSConfirmation(
-                          context);
+                      _showCompleteKRSConfirmation(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
@@ -388,8 +388,7 @@ class StudyPlanScreen extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.green,
+                backgroundColor: Colors.green,
               ),
               child: const Text('Selesaikan',
                   style: TextStyle(color: Colors.white)),
