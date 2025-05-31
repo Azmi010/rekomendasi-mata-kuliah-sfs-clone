@@ -1,6 +1,14 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:sfs/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:sfs/providers/auth_provider.dart';
+import 'package:sfs/services/auth_service.dart';
+import 'package:sfs/screens/auth/login_screen.dart';
+import 'package:sfs/screens/home/home_screen.dart';
+import 'package:sfs/screens/account/account_screen.dart';
+import 'package:sfs/services/course_service.dart';
+import 'package:sfs/widgets/bottom_navbar.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,14 +23,68 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        Provider<AuthService>(create: (_) => AuthService()),
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(
+            Provider.of<AuthService>(context, listen: false),
+          ),
+        ),
+        ChangeNotifierProvider(create: (_) => BottomNavBarProvider()),
+        Provider<CourseService>(create: (_) => CourseService()),
+      ],
+      child: MaterialApp(
+        title: 'SISTER for Student',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          appBarTheme: AppBarTheme(
+            color: const Color(0xFF1E90FF),
+            iconTheme: IconThemeData(color: Colors.white),
+            titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), // Warna teks judul AppBar
+          )
+        ),
+        debugShowCheckedModeBanner: false,
+        home: Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            if (authProvider.isLoading && authProvider.user == null) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(color: Color(0xFF1E90FF)),
+                ),
+              );
+            }
+            if (authProvider.user != null) {
+              return const MainScreenWrapper();
+            } else {
+              return const LoginScreen();
+            }
+          },
+        ),
       ),
-      home: const Text('Hello Firebase!'),
+    );
+  }
+}
+
+class MainScreenWrapper extends StatelessWidget {
+  const MainScreenWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomNavBarProvider = Provider.of<BottomNavBarProvider>(context);
+
+    final List<Widget> _pages = [
+      const HomeScreen(),
+      const AccountScreen(),
+    ];
+
+    return Scaffold(
+      body: IndexedStack(
+        index: bottomNavBarProvider.currentIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: const CustomBottomNavBar(),
     );
   }
 }
