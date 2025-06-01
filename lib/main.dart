@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:sfs/providers/auth_provider.dart';
+import 'package:sfs/providers/course_provider.dart';
 import 'package:sfs/repositories/course_repository.dart';
 import 'package:sfs/services/auth_service.dart';
 import 'package:sfs/screens/auth/login_screen.dart';
@@ -37,6 +38,11 @@ class MyApp extends StatelessWidget {
         Provider<CourseService>(
           create: (context) => CourseService(
             Provider.of<CourseRepository>(context, listen: false),
+          ),
+        ),
+        ChangeNotifierProvider<CourseProvider>(
+          create: (context) => CourseProvider(
+            Provider.of<CourseService>(context, listen: false),
           ),
         ),
       ],

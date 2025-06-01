@@ -5,7 +5,7 @@
 // import 'dart:convert'; // Untuk Utf8Decoder
 // import 'package:provider/provider.dart';
 // import 'package:sfs/models/course.dart'; // Import model Course dan RelevantCourse
-// import 'package:sfs/services/firesotore_service.dart';
+// import 'package:sfs/repositories/course_repository.dart';
 
 // class CsvUploadScreen extends StatefulWidget {
 //   const CsvUploadScreen({super.key});
@@ -67,7 +67,7 @@
 //           courses.add(Course(
 //             code: row[codeIndex].toString().trim(),
 //             name: row[nameIndex].toString().trim(),
-//             sks: row[sksIndex].toString().trim(),
+//             sks: row[sksIndex],
 //             type: row[typeIndex].toString().trim(),
 //           ));
 //         } else {
@@ -75,7 +75,7 @@
 //         }
 //       }
 
-//       final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+//       final firestoreService = Provider.of<CourseRepository>(context, listen: false);
 //       await firestoreService.uploadCourses(courses);
 //       _setStatus('${courses.length} mata kuliah berhasil diunggah.');
 //     } catch (e) {
@@ -144,7 +144,7 @@
 //         }
 //       }
 
-//       final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+//       final firestoreService = Provider.of<CourseRepository>(context, listen: false);
 //       await firestoreService.uploadRelevantCourses(relevantCourses);
 //       _setStatus('${relevantCourses.length} mata kuliah relevan berhasil diunggah.');
 //     } catch (e) {

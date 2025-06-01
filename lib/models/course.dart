@@ -2,7 +2,7 @@ class Course {
   final String code;
   final String name;
   final String type;
-  final String sks;
+  final int sks;
 
   Course({
     required this.code,
@@ -16,7 +16,7 @@ class Course {
       code: data['code'] as String,
       name: data['name'] as String,
       type: data['type'] as String,
-      sks: data['sks'] as String,
+      sks: data['sks'] as int,
     );
   }
 
