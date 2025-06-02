@@ -108,6 +108,14 @@ class CourseService {
             .map((doc) => SelectedCourseDetail.fromMap(doc.id, doc.data() as Map<String, dynamic>))
             .toList());
   }
+
+  Stream<List<SelectedCourseDetail>> getAllSelectedCoursesStream() {
+    if (_userId == null) return Stream.value([]);
+    return _courseRepository.fetchAllSelectedCoursesQuerySnapshotStream(_userId!)
+        .map((snapshot) => snapshot.docs
+            .map((doc) => SelectedCourseDetail.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+            .toList());
+  }
   
   Stream<KrsSemesterStatus> getKrsStatusStream(int userCurrentSemester) {
     if (_userId == null) return Stream.value(KrsSemesterStatus());

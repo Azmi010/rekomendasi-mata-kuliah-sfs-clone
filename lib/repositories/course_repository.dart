@@ -87,6 +87,15 @@ class CourseRepository {
         .doc(courseCode)
         .get();
   }
+
+  Stream<QuerySnapshot> fetchAllSelectedCoursesQuerySnapshotStream(String userId) {
+     return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('selected_courses')
+        .orderBy('semester')
+        .snapshots();
+  }
   
   Future<void> addCourseToUser({
     required String userId,
