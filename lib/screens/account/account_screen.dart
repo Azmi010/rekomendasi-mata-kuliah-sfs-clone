@@ -8,6 +8,7 @@ class AccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final _userData = authProvider.userData;
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -39,15 +40,14 @@ class AccountScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 15),
                   Text(
-                    authProvider.user?.email?.split('@')[0].toUpperCase() ??
-                        'NAMA PENGGUNA',
+                    _userData!.name,
                     style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
-                  const Text(
-                    '222410102068',
+                  Text(
+                    _userData.nim,
                     style: TextStyle(fontSize: 16, color: Colors.white70),
                   ),
                 ],
@@ -83,8 +83,8 @@ class AccountScreen extends StatelessWidget {
                           color: Color(0xFF1E90FF)),
                     ),
                     const SizedBox(height: 5),
-                    const Text(
-                      'Teknologi Informasi',
+                    Text(
+                      _userData.prodi,
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                     ),
                     const Divider(height: 20),

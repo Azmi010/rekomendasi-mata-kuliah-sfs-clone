@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sfs/providers/auth_provider.dart';
 import 'package:sfs/providers/course_provider.dart';
 import 'package:sfs/repositories/course_repository.dart';
+import 'package:sfs/repositories/user_repository.dart';
 import 'package:sfs/services/auth_service.dart';
 import 'package:sfs/screens/auth/login_screen.dart';
 import 'package:sfs/screens/home/home_screen.dart';
@@ -27,7 +28,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<AuthService>(create: (_) => AuthService()),
+        Provider<UserRepository>(create: (_) => UserRepository()),
+        Provider<AuthService>(
+          create: (context) => AuthService(
+            Provider.of<UserRepository>(context, listen: false),
+          ),
+        ),
         Provider<CourseRepository>(create: (_) => CourseRepository()),
         ChangeNotifierProvider(
           create: (context) => AuthProvider(
@@ -49,14 +55,16 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'SISTER for Student',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          appBarTheme: AppBarTheme(
-            color: const Color(0xFF1E90FF),
-            iconTheme: IconThemeData(color: Colors.white),
-            titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), // Warna teks judul AppBar
-          )
-        ),
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            appBarTheme: AppBarTheme(
+              color: const Color(0xFF1E90FF),
+              iconTheme: IconThemeData(color: Colors.white),
+              titleTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold), // Warna teks judul AppBar
+            )),
         debugShowCheckedModeBanner: false,
         home: Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
