@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sfs/providers/auth_provider.dart';
-import 'package:sfs/screens/milestone/milestone_screen.dart';
 import 'package:sfs/screens/transcript/transcript_screen.dart';
 import 'package:sfs/widgets/all_services_bottom_sheet.dart';
 import 'package:sfs/widgets/menu_grid_item.dart';
@@ -13,6 +12,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final _userData = authProvider.userData;
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -71,14 +71,14 @@ class HomeScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              authProvider.user?.email ?? 'Guest',
+                              _userData!.name,
                               style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white),
                             ),
-                            const Text(
-                              '222410102068',
+                            Text(
+                              _userData.nim,
                               style:
                                   TextStyle(fontSize: 14, color: Colors.white),
                             ),
@@ -115,15 +115,7 @@ class HomeScreen extends StatelessWidget {
               crossAxisSpacing: 15,
               children: [
                 MenuGridItem(
-                    icon: Icons.event_note,
-                    title: 'Milestone',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const MilestoneScreen()),
-                      );
-                    }),
+                    icon: Icons.event_note, title: 'Milestone', onTap: () {}),
                 MenuGridItem(
                     icon: Icons.devices_other, title: 'MMP', onTap: () {}),
                 MenuGridItem(

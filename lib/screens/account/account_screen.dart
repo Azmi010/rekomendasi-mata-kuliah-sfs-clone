@@ -8,6 +8,7 @@ class AccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final _userData = authProvider.userData;
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -18,10 +19,10 @@ class AccountScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.only(top: 20, bottom: 40),
               decoration: const BoxDecoration(
-                color: Color(0xFF1E90FF), // Warna biru
-                // Anda bisa menambahkan background image di sini jika ada pattern-nya
+                color: Color(0xFF1E90FF),
+                // untuk menambahkan pattern
                 // image: DecorationImage(
-                //   image: AssetImage('assets/img/background_pattern.png'), // Asumsikan ada gambar pattern
+                //   image: AssetImage('assets/img/background_pattern.png'),
                 //   fit: BoxFit.cover,
                 // ),
                 borderRadius: BorderRadius.only(
@@ -34,18 +35,19 @@ class AccountScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 60, color: const Color(0xFF1E90FF)),
+                    child: Icon(Icons.person,
+                        size: 60, color: const Color(0xFF1E90FF)),
                   ),
                   const SizedBox(height: 15),
                   Text(
-                    authProvider.user?.email?.split('@')[0].toUpperCase() ?? 'NAMA PENGGUNA',
+                    _userData!.name,
                     style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
-                  const Text(
-                    '222410102068',
+                  Text(
+                    _userData.nim,
                     style: TextStyle(fontSize: 16, color: Colors.white70),
                   ),
                 ],
@@ -75,17 +77,23 @@ class AccountScreen extends StatelessWidget {
                   children: [
                     const Text(
                       'Program Studi',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E90FF)),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E90FF)),
                     ),
                     const SizedBox(height: 5),
-                    const Text(
-                      'Teknologi Informasi',
+                    Text(
+                      _userData.prodi,
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                     ),
                     const Divider(height: 20),
                     const Text(
                       'Fakultas',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E90FF)),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E90FF)),
                     ),
                     const SizedBox(height: 5),
                     const Text(
@@ -107,13 +115,18 @@ class AccountScreen extends StatelessWidget {
                       context, Icons.fingerprint, 'Rekam Wajah', () {
                     // TODO: Implementasi rekaman wajah
                   }),
-                  _buildAccountMenuItem(
-                      context, Icons.lock, 'Ganti Password', () {
+                  _buildAccountMenuItem(context, Icons.lock, 'Ganti Password',
+                      () {
                     // TODO: Implementasi ganti password
                   }),
                   _buildAccountMenuItem(
                       context, Icons.description, 'Ketentuan Layanan', () {
-                    // TODO: Implementasi ketentuan layanan
+                    // kalau mau import data csv ke firebase
+                    //   Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //       builder: (context) => const CsvUploadScreen()),
+                    // );
                   }),
                   _buildAccountMenuItem(
                       context, Icons.security, 'Kebijakan Privasi', () {
