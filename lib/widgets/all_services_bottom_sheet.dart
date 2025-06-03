@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sfs/screens/milestone/milestone_screen.dart';
 import 'package:sfs/screens/study_plan/study_plan_screen.dart';
 import 'package:sfs/screens/transcript/transcript_screen.dart';
 import 'package:sfs/widgets/menu_grid_item.dart';
@@ -53,10 +52,6 @@ class AllServicesBottomSheet extends StatelessWidget {
                   title: 'Milestone',
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MilestoneScreen()),
-                  );
                   }),
               MenuGridItem(
                   icon: Icons.devices_other,

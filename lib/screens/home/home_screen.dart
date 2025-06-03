@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sfs/providers/auth_provider.dart';
-import 'package:sfs/screens/milestone/milestone_screen.dart';
 import 'package:sfs/screens/transcript/transcript_screen.dart';
 import 'package:sfs/widgets/all_services_bottom_sheet.dart';
 import 'package:sfs/widgets/menu_grid_item.dart';
@@ -115,15 +114,7 @@ class HomeScreen extends StatelessWidget {
               crossAxisSpacing: 15,
               children: [
                 MenuGridItem(
-                    icon: Icons.event_note,
-                    title: 'Milestone',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const MilestoneScreen()),
-                      );
-                    }),
+                    icon: Icons.event_note, title: 'Milestone', onTap: () {}),
                 MenuGridItem(
                     icon: Icons.devices_other, title: 'MMP', onTap: () {}),
                 MenuGridItem(
