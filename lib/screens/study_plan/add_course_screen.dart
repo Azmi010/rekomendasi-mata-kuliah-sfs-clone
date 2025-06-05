@@ -204,12 +204,6 @@ class AddCourseScreenState extends State<AddCourseScreen> {
                 if (cp.statusMessage != null) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (mounted && cp.statusMessage != null) {
-                      _showSnackBar(
-                        context,
-                        cp.statusMessage!,
-                        isError: !(cp.statusMessage!.contains('berhasil dimuat') || 
-                                   cp.statusMessage!.contains('berhasil ditambahkan')),
-                      );
                       cp.clearStatusMessage();
                     }
                   });

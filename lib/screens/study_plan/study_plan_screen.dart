@@ -39,9 +39,6 @@ class _StudyPlanViewState extends State<_StudyPlanView> {
     if (provider.statusMessage != null && provider.statusMessage!.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && provider.statusMessage != null) {
-          _showSnackBar(context, provider.statusMessage!,
-              isError: provider.statusMessage!.toLowerCase().contains('gagal') ||
-                       provider.statusMessage!.toLowerCase().contains('error'));
           provider.clearStatusMessage();
         }
       });
