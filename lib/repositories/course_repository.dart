@@ -12,40 +12,18 @@ class CourseRepository {
   //   WriteBatch batch = _firestore.batch();
 
   //   for (var course in courses) {
-  //     DocumentReference docRef = coursesCollection.doc(course.code);
+  //     DocumentReference docRef = coursesCollection.doc(); 
   //     batch.set(docRef, course.toMap());
   //   }
 
   //   await batch.commit();
-  //   print('Courses uploaded successfully!');
-  // }
-
-  // Upload Mata Kuliah Relevan
-  // Future<void> uploadRelevantCourses(List<RelevantCourse> relevantCourses) async {
-  //   final CollectionReference relevantCoursesCollection = _firestore.collection('relevant_courses');
-  //   WriteBatch batch = _firestore.batch();
-
-  //   for (var relevantCourse in relevantCourses) {
-  //     DocumentReference docRef = relevantCoursesCollection.doc();
-  //     batch.set(docRef, relevantCourse.toMap());
-  //   }
-
-  //   await batch.commit();
-  //   print('Relevant courses uploaded successfully!');
+  //   print('Courses uploaded successfully with auto-generated IDs!');
   // }
 
   // Get Mata Kuliah
   Future<List<Course>> getCoursesFromFirestore() async {
     QuerySnapshot snapshot = await _firestore.collection('courses').get();
     return snapshot.docs.map((doc) => Course.fromMap(doc.data() as Map<String, dynamic>)).toList();
-  }
-
-  Future<List<RelevantCourse>> getRelevantCoursesForMainCourse(String mainCourseCode) async {
-    QuerySnapshot snapshot = await _firestore
-        .collection('relevant_courses')
-        .where('mainCourseCode', isEqualTo: mainCourseCode)
-        .get();
-    return snapshot.docs.map((doc) => RelevantCourse.fromMap(doc.data() as Map<String, dynamic>)).toList();
   }
 
   Future<DocumentSnapshot> fetchUserDocument(String userId) async {
@@ -59,6 +37,17 @@ class CourseRepository {
         .collection('krs_status')
         .doc(krsSemesterKey)
         .snapshots();
+  }
+
+  Future<List<String>> fetchSelectedCourseCodesForSemester(String userId, int semester) async {
+    final QuerySnapshot snapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('selected_courses')
+        .where('semester', isEqualTo: semester)
+        .get();
+    
+    return snapshot.docs.map((doc) => doc.id).toList(); 
   }
 
   Stream<QuerySnapshot> fetchSelectedCoursesQuerySnapshotStream(String userId, int userCurrentSemester) {
