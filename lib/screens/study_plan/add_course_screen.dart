@@ -359,7 +359,7 @@ class AddCourseScreenState extends State<AddCourseScreen> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25)),
                   extendedPadding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                 )
               : const SizedBox.shrink();
         },

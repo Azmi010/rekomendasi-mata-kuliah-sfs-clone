@@ -166,8 +166,9 @@ class _StudyPlanViewState extends State<_StudyPlanView> {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
         title: const Text('Hapus Mata Kuliah'),
-        content: Text('Anda yakin ingin menghapus "${course.name}" (${course.code}) dari KRS?'),
+        content: Text('Apakah Anda yakin ingin menghapus "${course.name}" (${course.code}) dari KRS?'),
         actions: <Widget>[
           TextButton(child: const Text('Batal'), onPressed: () => Navigator.of(dialogContext).pop()),
           ElevatedButton(
@@ -187,8 +188,9 @@ class _StudyPlanViewState extends State<_StudyPlanView> {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
         title: const Text('Selesaikan Pengisian KRS'),
-        content: const Text('Anda yakin ingin menyelesaikan dan mengirim KRS ini? Setelah dikirim, Anda tidak dapat mengubahnya lagi sampai ada tindakan dari dosen wali.'),
+        content: const Text('Anda yakin ingin menyelesaikan dan mengirim KRS ini?'),
         actions: <Widget>[
           TextButton(child: const Text('Batal'), onPressed: () => Navigator.of(dialogContext).pop()),
           ElevatedButton(
@@ -446,13 +448,13 @@ class _ActionButtons extends StatelessWidget {
       return Row(children: [
         Expanded(
           child: ElevatedButton.icon(
-            icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
+            icon: const Icon(Icons.add_circle_outline_rounded, size: 20, color: Colors.white,),
             label: const Text('Tambah MK'),
             onPressed: isAddDisabled ? null : onAddCourse,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E90FF), foregroundColor: Colors.white,
               disabledBackgroundColor: Colors.grey.shade400,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
@@ -461,13 +463,13 @@ class _ActionButtons extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: ElevatedButton.icon(
-            icon: const Icon(Icons.check_circle_outline_rounded, size: 20),
+            icon: const Icon(Icons.check_circle_outline_rounded, size: 20, color: Colors.white,),
             label: const Text('Selesaikan'),
             onPressed: !canSubmit ? null : onSubmitKrs,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green.shade600, foregroundColor: Colors.white,
               disabledBackgroundColor: Colors.grey.shade400,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
@@ -479,13 +481,13 @@ class _ActionButtons extends StatelessWidget {
       return SizedBox(
         width: double.infinity,
         child: ElevatedButton.icon(
-          icon: const Icon(Icons.cancel_schedule_send_outlined, size: 20),
+          icon: const Icon(Icons.cancel_schedule_send_outlined, size: 20, color: Colors.red,),
           label: const Text('Batalkan Pengiriman KRS'),
           onPressed: onCancelKrsSubmission,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.orange.shade700, foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            backgroundColor: Colors.white, foregroundColor: Colors.red,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: Colors.red, width: 1.5)),
             textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
         ),
