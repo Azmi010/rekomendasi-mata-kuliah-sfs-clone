@@ -111,7 +111,7 @@ class CourseProvider extends ChangeNotifier {
       _filteredCoursesToDisplay.removeWhere((c) => c.code.trim().toLowerCase() == selectedCodeNormalized);
       _selectedCourse = null;
     } catch (e) {
-      _statusMessage = 'Gagal menambahkan mata kuliah: ${e.toString().replaceFirst("Exception: ", "")}';
+      _statusMessage = e.toString().replaceFirst("Exception: ", "");
     } finally {
       _isLoading = false;
       notifyListeners();
