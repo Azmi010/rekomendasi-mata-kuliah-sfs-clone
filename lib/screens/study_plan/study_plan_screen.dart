@@ -282,7 +282,7 @@ class _KrsStatusInfo extends StatelessWidget {
           message: 'KRS TELAH DISETUJUI OLEH DOSEN WALI',
           icon: Icons.check_circle_rounded,
           iconColor: Colors.green.shade700,
-          bgColor: Colors.green.shade50,
+          bgColor: Colors.blue.shade50,
           textColor: Colors.green.shade800,
         )
       );
@@ -364,6 +364,7 @@ class _CourseList extends StatelessWidget {
       itemBuilder: (context, index) {
         final course = selectedCourses[index];
         return Card(
+          color: Colors.white,
           margin: const EdgeInsets.only(bottom: 12),
           elevation: 1.5,
           shadowColor: Colors.grey.withOpacity(0.15),
@@ -449,12 +450,12 @@ class _ActionButtons extends StatelessWidget {
         Expanded(
           child: ElevatedButton.icon(
             icon: const Icon(Icons.add_circle_outline_rounded, size: 20, color: Colors.white,),
-            label: const Text('Tambah MK'),
+            label: const Text('Tambah Data'),
             onPressed: isAddDisabled ? null : onAddCourse,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E90FF), foregroundColor: Colors.white,
               disabledBackgroundColor: Colors.grey.shade400,
-              padding: const EdgeInsets.symmetric(vertical: 18),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
@@ -469,7 +470,7 @@ class _ActionButtons extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green.shade600, foregroundColor: Colors.white,
               disabledBackgroundColor: Colors.grey.shade400,
-              padding: const EdgeInsets.symmetric(vertical: 18),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),

@@ -76,6 +76,7 @@ class AddCourseScreenState extends State<AddCourseScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.grey[100],
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           title: const Row(
@@ -131,6 +132,7 @@ class AddCourseScreenState extends State<AddCourseScreen> {
 
   Widget _buildRecommendationListItem(RecommendedCourse course) {
     return Card(
+      color: Colors.white,
       elevation: 0,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
@@ -189,24 +191,28 @@ class AddCourseScreenState extends State<AddCourseScreen> {
 
     if (authProvider.user == null) {
       return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(title: const Text('Tambah Mata Kuliah')),
         body: const Center(child: Text('Anda harus login.')),
       );
     }
     if ((authProvider.userData == null && !_isInitialDataLoaded)) {
       return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(title: const Text('Tambah Mata Kuliah')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     if (authProvider.userData == null && _isInitialDataLoaded) {
       return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(title: const Text('Tambah Mata Kuliah')),
         body: const Center(child: Text('Gagal memuat data pengguna.')),
       );
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Tambah Mata Kuliah',
             style: TextStyle(color: Colors.white)),
@@ -283,6 +289,7 @@ class AddCourseScreenState extends State<AddCourseScreen> {
                     itemBuilder: (context, index) {
                       final course = courseProvider.filteredCourses[index];
                       return Card(
+                        color: Colors.grey[100],
                         margin: const EdgeInsets.only(bottom: 10),
                         elevation: 1,
                         shape: RoundedRectangleBorder(

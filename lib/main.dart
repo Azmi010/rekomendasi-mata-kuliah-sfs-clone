@@ -105,9 +105,11 @@ class MainScreenWrapper extends StatelessWidget {
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: bottomNavBarProvider.currentIndex,
-        children: _pages,
+      body: SafeArea(
+        child: IndexedStack(
+          index: bottomNavBarProvider.currentIndex,
+          children: _pages,
+        ),
       ),
       bottomNavigationBar: const CustomBottomNavBar(),
     );

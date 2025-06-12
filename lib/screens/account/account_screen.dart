@@ -5,10 +5,65 @@ import 'package:sfs/providers/auth_provider.dart';
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1E90FF),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          title: const Text(
+            'Apakah Anda ingin keluar?',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Tidak',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Ya',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                authProvider.signOut();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final _userData = authProvider.userData;
+    final userData = authProvider.userData;
+
+    if (userData == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF1E90FF)),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -40,14 +95,14 @@ class AccountScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 15),
                   Text(
-                    _userData!.name,
+                    userData.name,
                     style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
                   Text(
-                    _userData.nim,
+                    userData.nim,
                     style: TextStyle(fontSize: 16, color: Colors.white70),
                   ),
                 ],
@@ -55,7 +110,6 @@ class AccountScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Section "Program Studi" dan "Fakultas"
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
@@ -84,7 +138,7 @@ class AccountScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      _userData.prodi,
+                      userData.prodi,
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                     ),
                     const Divider(height: 20),
@@ -106,18 +160,15 @@ class AccountScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Daftar Menu (Rekam Wajah, Ganti Password, dll.)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
                   _buildAccountMenuItem(
                       context, Icons.fingerprint, 'Rekam Wajah', () {
-                    // TODO: Implementasi rekaman wajah
                   }),
                   _buildAccountMenuItem(context, Icons.lock, 'Ganti Password',
                       () {
-                    // TODO: Implementasi ganti password
                   }),
                   _buildAccountMenuItem(
                       context, Icons.description, 'Ketentuan Layanan', () {
@@ -130,25 +181,23 @@ class AccountScreen extends StatelessWidget {
                   }),
                   _buildAccountMenuItem(
                       context, Icons.security, 'Kebijakan Privasi', () {
-                    // TODO: Implementasi kebijakan privasi
                   }),
                 ],
               ),
             ),
             const SizedBox(height: 20),
 
-            // Tombol Logout
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    await authProvider.signOut();
+                  onPressed: () {
+                    _showLogoutConfirmationDialog(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -167,10 +216,10 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  // Helper method untuk membangun item menu di AccountScreen
   Widget _buildAccountMenuItem(
       BuildContext context, IconData icon, String title, VoidCallback onTap) {
     return Card(
+      color: Colors.white,
       margin: const EdgeInsets.only(bottom: 10),
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -181,7 +230,7 @@ class AccountScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 16.0),
           child: Row(
             children: [
-              Icon(icon, color: const Color(0xFF1E90FF)), // Ikon biru
+              Icon(icon, color: const Color(0xFF1E90FF)),
               const SizedBox(width: 15),
               Expanded(
                 child: Text(

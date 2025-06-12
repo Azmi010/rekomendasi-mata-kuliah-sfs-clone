@@ -22,6 +22,7 @@ class CustomBottomNavBar extends StatelessWidget {
     final bottomNavBarProvider = Provider.of<BottomNavBarProvider>(context);
 
     return BottomNavigationBar(
+      backgroundColor: Colors.white,
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
