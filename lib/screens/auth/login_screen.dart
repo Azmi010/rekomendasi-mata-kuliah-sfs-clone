@@ -10,10 +10,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController =
-      TextEditingController(); // Untuk Username
-  final TextEditingController _passwordController =
-      TextEditingController(); // Untuk Password
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
@@ -24,15 +24,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _performLogin() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    // Di sini kita asumsikan "Username" adalah Email untuk Firebase Auth
-    // Jika Username di aplikasi Anda bukan email, Anda perlu memetakan atau
-    // memiliki backend kustom untuk autentikasi username/password.
-    // Untuk tujuan demo Firebase Auth, kita akan gunakan sebagai email.
     String email = _usernameController.text.trim();
     String password = _passwordController.text.trim();
 
-    // Validasi sederhana
     if (email.isEmpty || password.isEmpty) {
       _showSnackBar('Email dan Password tidak boleh kosong.');
       return;
@@ -43,14 +37,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted && errorMessage != null) {
       _showSnackBar(errorMessage);
     }
-    // Jika login berhasil, AuthProvider akan otomatis mengubah state user
-    // dan Consumer di main.dart akan mengarahkan ke HomeScreen.
   }
 
-  // Fungsi untuk menampilkan SnackBar
   void _showSnackBar(String message) {
     if (mounted) {
-      // Tambahkan cek mounted di sini juga
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
@@ -59,12 +49,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xFF1E90FF),
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
-          height: MediaQuery.of(context).size.height,
+          height: screenHeight,
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -72,27 +64,48 @@ class _LoginScreenState extends State<LoginScreen> {
               const Spacer(flex: 2),
 
               // Logo dan Judul
-              Image.asset(
-                'assets/img/logo.png',
-                height: 120,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'SISTER for Student',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                ),
-              ),
-              const Text(
-                'NEXTGEN',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
+              Column(
+                children: [
+                  Image.asset(
+                    'assets/img/logo.png',
+                    height: 110,
+                  ),
+                  const SizedBox(height: 15),
+                  const Text(
+                    'SISTER for Student',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  Container(
+                    height: 3,
+                    width: 230,
+                    decoration: BoxDecoration(
+                      color: Colors.yellow.shade200,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  const Text(
+                    'NEXTGEN',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Container(
+                    height: 2,
+                    width: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.yellow.shade200,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ],
               ),
               const Spacer(),
 
@@ -102,21 +115,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: TextField(
                   controller: _usernameController,
+                  textAlignVertical: TextAlignVertical.center,
                   decoration: const InputDecoration(
-                    hintText: 'Username',
-                    prefixIcon: Icon(Icons.person, color: Color(0xFF1E90FF)),
+                    hintText: 'Email',
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(left: 20.0, right: 12.0),
+                      child: Icon(Icons.person, color: Color(0xFF1E90FF)),
+                    ),
                     border: InputBorder.none,
                     hintStyle: TextStyle(color: Colors.grey),
+                    contentPadding: EdgeInsets.symmetric(vertical: 14), 
                   ),
                   keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(color: Colors.black),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
 
               // Input Password
               Container(
@@ -124,17 +140,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: TextField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
                     hintText: 'Kata Sandi',
-                    prefixIcon: Icon(Icons.lock, color: Color(0xFF1E90FF)),
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 20.0, right: 12.0),
+                      child: Icon(Icons.lock, color: Color(0xFF1E90FF)),
+                    ),
                     border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
                   ),
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible, 
                   style: const TextStyle(color: Colors.black),
                 ),
               ),
@@ -167,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: _performLogin,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.pink,
-                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),

@@ -1,10 +1,9 @@
-// // lib/screens/admin/csv_upload_screen.dart
 // import 'package:flutter/material.dart';
 // import 'package:file_picker/file_picker.dart';
 // import 'package:csv/csv.dart';
-// import 'dart:convert'; // Untuk Utf8Decoder
+// import 'dart:convert';
 // import 'package:provider/provider.dart';
-// import 'package:sfs/models/course.dart'; // Import model Course dan RelevantCourse
+// import 'package:sfs/models/course.dart';
 // import 'package:sfs/repositories/course_repository.dart';
 
 // class CsvUploadScreen extends StatefulWidget {
@@ -31,134 +30,122 @@
 
 //     setState(() {
 //       _isLoading = true;
-//       _statusMessage = 'Mengunggah data mata kuliah...';
+//       _statusMessage = 'Mengurai dan mengunggah data mata kuliah...';
 //     });
 
 //     try {
 //       final bytes = result.files.single.bytes!;
-//       final csvString = const Utf8Decoder().convert(bytes);
-//       List<List<dynamic>> rowsAsListOfList = const CsvToListConverter().convert(csvString);
+//       final csvString = const Utf8Decoder(allowMalformed: true).convert(bytes);
+//       List<List<dynamic>> rowsAsListOfList = const CsvToListConverter(
+//         eol: '\n',
+//       ).convert(csvString);
 
-//       if (rowsAsListOfList.isEmpty) {
-//         _setStatus('File CSV mata kuliah kosong.', isError: true);
+//       if (rowsAsListOfList.length < 2) {
+//         _setStatus('File CSV mata kuliah kosong atau hanya berisi header.', isError: true);
 //         setState(() => _isLoading = false);
 //         return;
 //       }
 
-//       // Asumsi baris pertama adalah header
-//       final headers = rowsAsListOfList[0];
+//       final headers = rowsAsListOfList[0].map((header) => header.toString().trim().toLowerCase()).toList();
 //       final dataRows = rowsAsListOfList.sublist(1);
 
-//       // Cari indeks kolom berdasarkan header (lebih robust)
-//       final codeIndex = headers.indexOf('kode');
-//       final nameIndex = headers.indexOf('nama');
-//       final typeIndex = headers.indexOf('type');
-//       final sksIndex = headers.indexOf('sks');
+//       print('Detected CSV Headers: $headers');
 
-//       if (codeIndex == -1 || nameIndex == -1 || sksIndex == -1 || typeIndex == -1) {
-//         _setStatus('Header CSV mata kuliah tidak valid. Pastikan ada "kode", "nama", "type", "sks".', isError: true);
+//       final codeIndex = headers.indexOf('kode_matkul');
+//       final nameIndex = headers.indexOf('nama_matkul');
+//       final typeIndex = headers.indexOf('sifat_mk');
+//       final sksIndex = headers.indexOf('sks_matkul');
+//       final semesterMatkulIndex = headers.indexOf('semester_matkul');
+//       final prodiMatkulIndex = headers.indexOf('prodi_matkul');
+//       final hariIndex = headers.indexOf('hari');
+//       final jamMulaiIndex = headers.indexOf('jam_mulai');
+//       final jamSelesaiIndex = headers.indexOf('jam_selesai');
+
+//       Map<String, int> headerMap = {
+//         'kode_matkul': codeIndex, 'nama_matkul': nameIndex, 'sifat_mk': typeIndex,
+//         'sks_matkul': sksIndex, 'semester_matkul': semesterMatkulIndex, 
+//         'prodi_matkul': prodiMatkulIndex, 'hari': hariIndex,
+//         'jam_mulai': jamMulaiIndex, 'jam_selesai': jamSelesaiIndex,
+//       };
+
+//       List<String> missingHeaders = [];
+//       headerMap.forEach((key, value) {
+//         if (value == -1) {
+//           missingHeaders.add(key);
+//         }
+//       });
+
+//       if (missingHeaders.isNotEmpty) {
+//         _setStatus('Header CSV mata kuliah tidak valid. Header berikut tidak ditemukan: ${missingHeaders.join(", ")}.', isError: true);
 //         setState(() => _isLoading = false);
 //         return;
 //       }
 
 //       List<Course> courses = [];
+//       int rowIndex = 1;
 //       for (var row in dataRows) {
-//         if (row.length > codeIndex && row.length > nameIndex && row.length > sksIndex && row.length > typeIndex) {
+//         rowIndex++;
+//         try {
+//           if (row.length < headers.length) {
+//              print('Skipping malformed row $rowIndex (too few columns): $row');
+//              continue;
+//           }
+
+//           final sksValue = int.tryParse(row[sksIndex].toString().trim());
+//           final semesterValue = int.tryParse(row[semesterMatkulIndex].toString().trim());
+
+//           if (sksValue == null) {
+//             print('Skipping row $rowIndex due to invalid SKS: ${row[sksIndex]}');
+//             continue;
+//           }
+//           if (semesterValue == null) {
+//             print('Skipping row $rowIndex due to invalid Semester: ${row[semesterMatkulIndex]}');
+//             continue;
+//           }
+          
 //           courses.add(Course(
 //             code: row[codeIndex].toString().trim(),
 //             name: row[nameIndex].toString().trim(),
-//             sks: row[sksIndex],
 //             type: row[typeIndex].toString().trim(),
+//             sks: sksValue,
+//             semesterMatkul: semesterValue,
+//             prodiMatkul: row[prodiMatkulIndex].toString().trim(),
+//             hari: row[hariIndex].toString().trim(),
+//             jamMulai: row[jamMulaiIndex].toString().trim(),
+//             jamSelesai: row[jamSelesaiIndex].toString().trim(),
 //           ));
-//         } else {
-//           print('Skipping malformed row: $row');
+//         } catch (e) {
+//           print('Error parsing row $rowIndex: $row. Error: $e');
 //         }
 //       }
 
-//       final firestoreService = Provider.of<CourseRepository>(context, listen: false);
-//       await firestoreService.uploadCourses(courses);
-//       _setStatus('${courses.length} mata kuliah berhasil diunggah.');
+//       if (courses.isEmpty && dataRows.isNotEmpty) {
+//         _setStatus('Tidak ada data mata kuliah valid yang bisa diproses dari file CSV.', isError: true);
+//       } else if (courses.isEmpty && dataRows.isEmpty) {
+//          _setStatus('Tidak ada baris data mata kuliah di file CSV.', isError: true);
+//       }
+//       else {
+//         final courseRepository = Provider.of<CourseRepository>(context, listen: false);
+//         await courseRepository.uploadCourses(courses);
+//         _setStatus('${courses.length} data mata kuliah berhasil diunggah.');
+//       }
+
 //     } catch (e) {
+//       print('Error during CSV processing: $e');
 //       _setStatus('Gagal mengunggah mata kuliah: ${e.toString()}', isError: true);
 //     } finally {
 //       setState(() => _isLoading = false);
 //     }
 //   }
 
-//   Future<void> _uploadRelevantCoursesCsv() async {
-//     FilePickerResult? result = await FilePicker.platform.pickFiles(
-//       type: FileType.custom,
-//       allowedExtensions: ['csv'],
-//     );
-
-//     if (result == null || result.files.single.bytes == null) {
-//       _setStatus('Pencarian file dibatalkan atau file kosong.', isError: true);
-//       return;
-//     }
-
-//     setState(() {
-//       _isLoading = true;
-//       _statusMessage = 'Mengunggah data mata kuliah relevan...';
-//     });
-
-//     try {
-//       final bytes = result.files.single.bytes!;
-//       final csvString = const Utf8Decoder().convert(bytes);
-//       List<List<dynamic>> rowsAsListOfList = const CsvToListConverter().convert(csvString);
-
-//       if (rowsAsListOfList.isEmpty) {
-//         _setStatus('File CSV mata kuliah relevan kosong.', isError: true);
-//         setState(() => _isLoading = false);
-//         return;
-//       }
-
-//       // Asumsi baris pertama adalah header
-//       final headers = rowsAsListOfList[0];
-//       final dataRows = rowsAsListOfList.sublist(1);
-
-//       // Cari indeks kolom berdasarkan header
-//       final mainCourseNameIndex = headers.indexOf('nama_mk_utama');
-//       final mainCourseCodeIndex = headers.indexOf('kode_mk_utama');
-//       final relevantCourseNameIndex = headers.indexOf('nama_mk_relevan');
-//       final relevantCourseCodeIndex = headers.indexOf('kode_mk_relevan');
-
-//       if (mainCourseCodeIndex == -1 || relevantCourseCodeIndex == -1 || mainCourseNameIndex == -1 || relevantCourseNameIndex == -1) {
-//         _setStatus('Header CSV mata kuliah relevan tidak valid. Pastikan ada "nama_mk_utama", "kode_mk_utama", "nama_mk_relevan", "kode_mk_relevan".', isError: true);
-//         setState(() => _isLoading = false);
-//         return;
-//       }
-
-
-//       List<RelevantCourse> relevantCourses = [];
-//       for (var row in dataRows) {
-//         if (row.length > mainCourseCodeIndex && row.length > relevantCourseCodeIndex && 
-//             row.length > mainCourseNameIndex && row.length > relevantCourseNameIndex) {
-//           relevantCourses.add(RelevantCourse(
-//             mainCourseName: row[0].toString().trim(), // Asumsi nama mata kuliah utama ada di kolom pertama
-//             mainCourseCode: row[mainCourseCodeIndex].toString().trim(),
-//             relevantCourseName: row[2].toString().trim(), // Asumsi nama mata kuliah relevan ada di kolom kedua
-//             relevantCourseCode: row[relevantCourseCodeIndex].toString().trim(),
-//           ));
-//         } else {
-//           print('Skipping malformed row: $row');
-//         }
-//       }
-
-//       final firestoreService = Provider.of<CourseRepository>(context, listen: false);
-//       await firestoreService.uploadRelevantCourses(relevantCourses);
-//       _setStatus('${relevantCourses.length} mata kuliah relevan berhasil diunggah.');
-//     } catch (e) {
-//       _setStatus('Gagal mengunggah mata kuliah relevan: ${e.toString()}', isError: true);
-//     } finally {
-//       setState(() => _isLoading = false);
-//     }
-//   }
-
 //   void _setStatus(String message, {bool isError = false}) {
+//     if (!mounted) return;
+//     ScaffoldMessenger.of(context).removeCurrentSnackBar();
 //     ScaffoldMessenger.of(context).showSnackBar(
 //       SnackBar(
 //         content: Text(message),
-//         backgroundColor: isError ? Colors.red : Colors.green,
+//         backgroundColor: isError ? Colors.redAccent : Colors.green,
+//         duration: Duration(seconds: isError ? 5 : 3),
 //       ),
 //     );
 //     setState(() {
@@ -170,9 +157,9 @@
 //   Widget build(BuildContext context) {
 //     return Scaffold(
 //       appBar: AppBar(
-//         title: const Text('Unggah Data Firebase', style: TextStyle(color: Colors.white)),
+//         title: const Text('Unggah Data CSV', style: TextStyle(color: Colors.white)),
 //         backgroundColor: const Color(0xFF1E90FF),
-//         elevation: 0,
+//         elevation: 1,
 //         leading: IconButton(
 //           icon: const Icon(Icons.arrow_back, color: Colors.white),
 //           onPressed: () {
@@ -185,44 +172,22 @@
 //           padding: const EdgeInsets.all(20.0),
 //           child: Column(
 //             mainAxisAlignment: MainAxisAlignment.center,
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
 //             children: [
 //               ElevatedButton.icon(
 //                 onPressed: _isLoading ? null : _uploadCoursesCsv,
-//                 icon: const Icon(Icons.upload_file),
-//                 label: const Text('Unggah Data Mata Kuliah (CSV)'),
+//                 icon: const Icon(Icons.school_outlined),
+//                 label: const Text('Unggah Mata Kuliah'),
 //                 style: ElevatedButton.styleFrom(
 //                   backgroundColor: const Color(0xFF1E90FF),
 //                   foregroundColor: Colors.white,
-//                   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-//                   textStyle: const TextStyle(fontSize: 16),
-//                 ),
-//               ),
-//               const SizedBox(height: 20),
-//               ElevatedButton.icon(
-//                 onPressed: _isLoading ? null : _uploadRelevantCoursesCsv,
-//                 icon: const Icon(Icons.upload_file),
-//                 label: const Text('Unggah Data Mata Kuliah Relevan (CSV)'),
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: Colors.orange,
-//                   foregroundColor: Colors.white,
-//                   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-//                   textStyle: const TextStyle(fontSize: 16),
+//                   padding: const EdgeInsets.symmetric(vertical: 15),
+//                   textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+//                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
 //                 ),
 //               ),
 //               const SizedBox(height: 30),
-//               if (_isLoading) const CircularProgressIndicator(),
-//               if (_statusMessage != null)
-//                 Padding(
-//                   padding: const EdgeInsets.only(top: 20),
-//                   child: Text(
-//                     _statusMessage!,
-//                     textAlign: TextAlign.center,
-//                     style: TextStyle(
-//                       color: _statusMessage!.contains('berhasil') ? Colors.green : Colors.red,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 ),
+//               if (_isLoading) const Center(child: CircularProgressIndicator()),
 //             ],
 //           ),
 //         ),

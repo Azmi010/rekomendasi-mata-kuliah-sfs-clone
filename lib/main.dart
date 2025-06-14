@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:sfs/providers/auth_provider.dart';
 import 'package:sfs/providers/course_provider.dart';
+import 'package:sfs/providers/recommendation_provider.dart';
 import 'package:sfs/repositories/course_repository.dart';
 import 'package:sfs/repositories/user_repository.dart';
 import 'package:sfs/services/auth_service.dart';
@@ -51,6 +52,10 @@ class MyApp extends StatelessWidget {
             Provider.of<CourseService>(context, listen: false),
           ),
         ),
+        ChangeNotifierProxyProvider<AuthProvider, RecommendationProvider>(
+          create: (_) => RecommendationProvider(null),
+          update: (context, auth, previous) => RecommendationProvider(auth),
+        ),
       ],
       child: MaterialApp(
         title: 'SISTER for Student',
@@ -63,7 +68,7 @@ class MyApp extends StatelessWidget {
               titleTextStyle: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
-                  fontWeight: FontWeight.bold), // Warna teks judul AppBar
+                  fontWeight: FontWeight.bold),
             )),
         debugShowCheckedModeBanner: false,
         home: Consumer<AuthProvider>(
@@ -100,9 +105,11 @@ class MainScreenWrapper extends StatelessWidget {
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: bottomNavBarProvider.currentIndex,
-        children: _pages,
+      body: SafeArea(
+        child: IndexedStack(
+          index: bottomNavBarProvider.currentIndex,
+          children: _pages,
+        ),
       ),
       bottomNavigationBar: const CustomBottomNavBar(),
     );

@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:sfs/models/course.dart';
 import 'package:sfs/models/krs_semester_status.dart';
 import 'package:sfs/models/selected_course_detail.dart';
 import 'package:sfs/models/user_data.dart';
 import 'package:sfs/repositories/course_repository.dart';
+import 'package:sfs/utils/time_utils.dart';
 
 class CourseService {
   final CourseRepository _courseRepository;
@@ -51,23 +53,64 @@ class CourseService {
       final int currentSemester = userData.currentSemester;
 
       final krsStatusDocId = 'semester_$currentSemester';
-      final krsStatusDoc = await _courseRepository.fetchKrsStatusDocumentStream(_userId!, krsStatusDocId).first; // Ambil data sekali
-
+      final krsStatusDoc = await _courseRepository.fetchKrsStatusDocumentStream(_userId!, krsStatusDocId).first;
       if (krsStatusDoc.exists) {
         final krsStatusData = KrsSemesterStatus.fromMap(krsStatusDoc.data() as Map<String, dynamic>?);
         if (krsStatusData.isSubmitted || krsStatusData.isApproved) {
-          throw Exception('KRS semester ini sudah ${krsStatusData.isApproved ? "disetujui" : "dikirim"}.');
+          throw Exception('KRS semester ini sudah ${krsStatusData.isApproved ? "disetujui" : "dikirim"}. Tidak dapat menambah mata kuliah.');
         }
       }
+
+      TimeOfDay? newCourseStartTime;
+      TimeOfDay? newCourseEndTime;
+      if (course.hari.trim().isNotEmpty) {
+        newCourseStartTime = tryParseTimeOfDayRobust(course.jamMulai);
+        newCourseEndTime = tryParseTimeOfDayRobust(course.jamSelesai);
+
+        if (newCourseStartTime == null || newCourseEndTime == null) {
+          throw Exception("Format waktu tidak valid untuk mata kuliah ${course.name} (${course.code}): Jam Mulai='${course.jamMulai}', Jam Selesai='${course.jamSelesai}'.");
+        }
+        if (timeOfDayToMinutes(newCourseStartTime) >= timeOfDayToMinutes(newCourseEndTime)) {
+          throw Exception("Rentang waktu tidak valid (mulai >= selesai) untuk mata kuliah ${course.name}: ${course.jamMulai} - ${course.jamSelesai}.");
+        }
+      } else if (course.jamMulai.trim().isNotEmpty || course.jamSelesai.trim().isNotEmpty) {
+        throw Exception("Data jadwal tidak lengkap (hari kosong tapi jam terisi) untuk mata kuliah ${course.name}.");
+      }
+
+      final QuerySnapshot currentSemesterCoursesSnapshot =
+          await _courseRepository.fetchCurrentSemesterCoursesSnapshot(_userId!, currentSemester);
       
-      final currentSemesterCoursesSnapshot = await _courseRepository.fetchCurrentSemesterCoursesSnapshot(_userId!, currentSemester);
-      int currentSksTaken = currentSemesterCoursesSnapshot.docs.fold(0, (sum, doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        int sksValue = (data['sks'] is String)
-            ? (int.tryParse(data['sks'] ?? '0') ?? 0)
-            : ((data['sks'] is int) ? data['sks'] as int : (data['sks'] is num ? (data['sks'] as num).toInt() : 0));
-        return sum + sksValue;
-      });
+      List<SelectedCourseDetail> currentlySelectedCourses = currentSemesterCoursesSnapshot.docs.map((doc) {
+          return SelectedCourseDetail.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+      }).toList();
+
+      if (course.hari.trim().isNotEmpty && newCourseStartTime != null && newCourseEndTime != null) {
+        for (var existingCourse in currentlySelectedCourses) {
+          if (existingCourse.hari.trim().toLowerCase() == course.hari.trim().toLowerCase() &&
+              existingCourse.hari.trim().isNotEmpty) {
+            
+            final TimeOfDay? existingCourseStartTime = tryParseTimeOfDayRobust(existingCourse.jamMulai);
+            final TimeOfDay? existingCourseEndTime = tryParseTimeOfDayRobust(existingCourse.jamSelesai);
+
+            if (existingCourseStartTime == null || existingCourseEndTime == null ||
+                timeOfDayToMinutes(existingCourseStartTime) >= timeOfDayToMinutes(existingCourseEndTime)) {
+              print("Peringatan: Data waktu tidak valid untuk MK yang sudah dipilih '${existingCourse.name}', dilewati dalam pengecekan bentrok.");
+              continue; 
+            }
+
+            if (doTimesOverlapInternal(
+              newCourseStart: newCourseStartTime,
+              newCourseEnd: newCourseEndTime,
+              existingCourseStart: existingCourseStartTime,
+              existingCourseEnd: existingCourseEndTime,
+            )) {
+              throw Exception('Jadwal bentrok dengan ${existingCourse.name} (${existingCourse.code}) pada hari ${course.hari}, jam ${existingCourse.jamMulai} - ${existingCourse.jamSelesai}.');
+            }
+          }
+        }
+      }
+
+      int currentSksTaken = currentlySelectedCourses.fold(0, (sum, sc) => sum + sc.sks);
       
       if (currentSksTaken + course.sks > 24) {
         throw Exception('Gagal. Total SKS akan melebihi 24 (Saat ini: $currentSksTaken SKS).');
@@ -79,26 +122,28 @@ class CourseService {
       }
 
       final courseDataToSave = {
-        'code': course.code,
-        'name': course.name,
-        'sks': course.sks,
-        'type': course.type,
-        'grade': '', 
-        'semester': currentSemester,
+        'code': course.code, 'name': course.name, 'sks': course.sks, 'type': course.type,
+        'semesterMatkul': course.semesterMatkul, 'prodiMatkul': course.prodiMatkul,
+        'hari': course.hari, 'jamMulai': course.jamMulai, 'jamSelesai': course.jamSelesai,
+        'grade': '', 'semester': currentSemester,
       };
-
       await _courseRepository.addCourseToUser(
-        userId: _userId!,
-        courseCode: course.code,
-        courseData: courseDataToSave,
+        userId: _userId!, courseCode: course.code, courseData: courseDataToSave,
       );
+
     } catch (e) {
-      rethrow;
+      rethrow; 
     }
   }
 
   Future<UserData> getUserProfile() async {
     return await _fetchUserDataModel();
+  }
+
+  Future<List<String>> getSelectedCourseCodesForCurrentSemester() async {
+    if (_userId == null) throw Exception("Pengguna belum login.");
+    final userData = await _fetchUserDataModel();
+    return await _courseRepository.fetchSelectedCourseCodesForSemester(_userId!, userData.currentSemester);
   }
 
   Stream<List<SelectedCourseDetail>> getSelectedCoursesStream(int userCurrentSemester) {

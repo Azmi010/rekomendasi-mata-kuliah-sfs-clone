@@ -250,7 +250,7 @@ class _CourseGradeCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      '${course.code} • ${course.sks} SKS • Semester ${course.semesterTaken}',
+                      '${course.code} • ${course.sks} SKS',
                       style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                     ),
                   ],
