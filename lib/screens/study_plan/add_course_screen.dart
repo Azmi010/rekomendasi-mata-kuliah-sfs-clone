@@ -171,6 +171,26 @@ class AddCourseScreenState extends State<AddCourseScreen> {
                 ),
               ],
             ),
+            if (course.careerPaths.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.work_outline_rounded,
+                      color: Colors.blue.shade700, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Relevansi Karier: ${course.careerPaths.join(', ')}",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
@@ -249,12 +269,10 @@ class AddCourseScreenState extends State<AddCourseScreen> {
               ),
             ),
             const SizedBox(height: 12),
-
             Align(
               alignment: Alignment.centerRight,
               child: TextButton.icon(
-                onPressed: () => _showRecommendationsDialog(
-                    context),
+                onPressed: () => _showRecommendationsDialog(context),
                 icon: const Icon(Icons.recommend_outlined, size: 20),
                 label: const Text('Lihat Rekomendasi'),
                 style: TextButton.styleFrom(
@@ -265,7 +283,6 @@ class AddCourseScreenState extends State<AddCourseScreen> {
               ),
             ),
             const SizedBox(height: 4),
-
             Expanded(
               child: Builder(
                 builder: (context) {
